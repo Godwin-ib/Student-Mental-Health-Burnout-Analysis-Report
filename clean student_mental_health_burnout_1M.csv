@@ -1,0 +1,85 @@
+SELECT * FROM `health mental`.student_mental_health_burnout_1m;
+-- Select the data to verify the table exists
+SELECT * FROM `health mental`.student_mental_health_burnout_1m;
+
+-- Add all required columns in one command
+ALTER TABLE `health mental`.student_mental_health_burnout_1m 
+ADD COLUMN is_depressed INTEGER,
+ADD COLUMN is_mentally_ill INTEGER,
+ADD COLUMN grade TEXT,
+ADD COLUMN course TEXT,
+ADD COLUMN marital_status TEXT;
+UPDATE student_health
+SET 
+    is_depressed = CASE WHEN depression_score > 2.5 THEN 1 ELSE 0 END,
+    is_mentally_ill = CASE WHEN mental_health_index < 5.5 THEN 1 ELSE 0 END,
+    grade = CASE 
+        WHEN academic_performance >= 80 THEN 'A'
+        WHEN academic_performance >= 70 THEN 'B'
+        WHEN academic_performance >= 60 THEN 'C'
+        ELSE 'D'
+    END,
+    course = CASE (ABS(RANDOM()) % 4)
+        WHEN 0 THEN 'Computer Science'
+        WHEN 1 THEN 'Psychology'
+        WHEN 2 THEN 'Engineering'
+        ELSE 'Medicine'
+    END,
+    marital_status = CASE (ABS(RANDOM()) % 2)
+        WHEN 0 THEN 'Single'
+        ELSE 'Married'
+    END;
+    
+    -- 3. Problem Statement Queries
+    Distribution of Depressed Students by Gender, Course, Grade, and Marital Status
+
+/* 1. DISTRIBUTION OF DEPRESSED STUDENTS */
+SELECT * FROM `health mental`.student_mental_health_burnout_1m;
+SELECT gender, course, grade, marital_status, COUNT(*) as count
+FROM `health mental`.student_mental_health_burnout_1m
+WHERE is_depressed = 1
+GROUP BY gender, course, grade, marital_status
+ORDER BY count DESC;
+
+/* 2. PIVOT TABLE: MENTALLY ILL STUDENTS BY YEAR AND GENDER */
+SELECT * FROM `health mental`.student_mental_health_burnout_1m;
+SELECT academic_year,
+       SUM(CASE WHEN gender = 'Male' AND is_mentally_ill = 1 THEN 1 ELSE 0 END) as Male_Mentally_Ill,
+       SUM(CASE WHEN gender = 'Female' AND is_mentally_ill = 1 THEN 1 ELSE 0 END) as Female_Mentally_Ill,
+       SUM(CASE WHEN gender = 'Other' AND is_mentally_ill = 1 THEN 1 ELSE 0 END) as Other_Mentally_Ill
+FROM `health mental`.student_mental_health_burnout_1m
+GROUP BY academic_year;
+
+/* 3. MARRIED WOMEN VS NON-MARRIED WOMEN */
+SELECT * FROM `health mental`.student_mental_health_burnout_1m;
+SELECT marital_status, COUNT(*) as count
+FROM `health mental`.student_mental_health_burnout_1m
+WHERE gender = 'Female'
+GROUP BY marital_status;
+
+
+-- 1. Verify the table content
+SELECT * FROM `health mental`.student_mental_health_burnout_1m;
+
+-- 2. Generate the Pivot Table for Mentally Ill Students
+SELECT 
+    academic_year,
+    SUM(CASE WHEN gender = 'Male' AND is_mentally_ill = 1 THEN 1 ELSE 0 END) AS Male_Mentally_Ill,
+    SUM(CASE WHEN gender = 'Female' AND is_mentally_ill = 1 THEN 1 ELSE 0 END) AS Female_Mentally_Ill,
+    SUM(CASE WHEN gender = 'Other' AND is_mentally_ill = 1 THEN 1 ELSE 0 END) AS Other_Mentally_Ill
+FROM `health mental`.student_mental_health_burnout_1m
+GROUP BY academic_year
+ORDER BY academic_year ASC;
+
+
+-- 1. Correctly quoting the schema with spaces using backticks
+
+SELECT * FROM `health mental`.student_mental_health_burnout_1m;
+
+-- 2. Applying the same schema and table name to the second query
+SELECT 
+    marital_status, 
+    COUNT(*) AS count
+FROM `health mental`.student_mental_health_burnout_1m
+WHERE gender = 'Female'
+GROUP BY marital_status;
